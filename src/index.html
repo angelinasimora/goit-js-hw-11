@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
+    <form class="form">
+      <input
+        class="input-search"
+        type="text"
+        name="search"
+        placeholder="Search images ... "
+      />
+      <button class="button-search" type="submit">Search</button>
+    </form>
+
+    <span class="loader is-hidden">Loading images, please wait...</span>
+
+    <ul class="gallery"></ul>
+
     <script type="module" src="./main.js"></script>
   </body>
 </html>
