@@ -1,27 +1,32 @@
-export const searchImage = search => {
+export const searchImage = async (search) => {
+  const API_KEY = '47412698-017a3cc161c8c283fa818e1a7';
+  const BASE_URL = 'https://pixabay.com/api/';
+
   const searchParams = new URLSearchParams({
-    key: '47412698-017a3cc161c8c283fa818e1a7',
+    key: API_KEY,
     q: search,
     image_type: 'photo',
     orientation: 'horizontal',
     safesearch: true,
   });
 
-  const url = `https://pixabay.com/api/?${searchParams}`;
+  const url = `${BASE_URL}?${searchParams}`;
 
-  const options = {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      Host: 'http://localhost:5173',
-      Origin: 'https://pixabay.com/api',
-    },
-  };
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
 
-  return fetch(url, options).then(response => {
     if (!response.ok) {
-      throw new Error(response.status);
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    return response.json();
-  });
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching images:', error.message);
+    throw error; // Прокидуємо помилку далі для обробки у виклику функції.
+  }
 };

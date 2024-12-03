@@ -1,5 +1,4 @@
 import iziToast from 'izitoast';
-
 import 'izitoast/dist/css/iziToast.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import SimpleLightbox from 'simplelightbox';
@@ -11,7 +10,7 @@ const form = document.querySelector('.form');
 const gallery = document.querySelector('ul.gallery');
 const loader = document.querySelector('.loader');
 
-let lightbox = new SimpleLightbox('.galery a', {
+let lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
   captionDelay: 250,
 });
@@ -21,13 +20,14 @@ iziToast.settings({
   position: 'topRight',
 });
 
-const createGalary = e => {
+const createGallery = async (e) => {
   e.preventDefault();
-  gallery.innerHTML = '';
-  loader.style.display = 'block';
+  gallery.innerHTML = ''; // Очищення результатів виконується один раз.
+  loader.style.display = 'block'; // Показуємо завантажувач.
+  
   const searchText = e.target.elements.search.value.trim();
 
-  if (searchText === '') {
+  if (!searchText) {
     iziToast.error({
       iconUrl: errorIcon,
       iconColor: '#fff',
@@ -35,50 +35,41 @@ const createGalary = e => {
       messageColor: '#fff',
       message: 'Please write a query for search',
     });
-    gallery.innerHTML = '';
-    loader.style.display = 'none';
+    loader.style.display = 'none'; // Приховуємо завантажувач.
     return;
   }
 
-  searchImage(searchText)
-    .then(({ hits }) => {
-      gallery.innerHTML = '';
-     
+  try {
+    const { hits } = await searchImage(searchText);
 
-      const images = renderImages(hits);
-      if (images) {
-        loader.style.display = 'none';
-      }
-
-      if (hits.length === 0) {
-        iziToast.error({
-          iconUrl: errorIcon,
-          iconColor: '#fff',
-          imageWidth: 24,
-          messageColor: '#fff',
-          message:
-            'Sorry, there are no images matching your search query. Please try again!',
-        });
-        loader.style.display = 'none';
-        gallery.innerHTML = '';
-      }
-
-      gallery.innerHTML = images;
-      lightbox.refresh();
-      form.reset();
-    })
-    .catch(error => {
-      console.log(error);
-      
-      gallery.innerHTML = '';
+    if (!hits.length) {
       iziToast.error({
         iconUrl: errorIcon,
         iconColor: '#fff',
         imageWidth: 24,
         messageColor: '#fff',
-        message: error,
+        message:
+          'Sorry, there are no images matching your search query. Please try again!',
       });
+    } else {
+      const images = renderImages(hits);
+      gallery.innerHTML = images; // Додаємо зображення до галереї.
+      lightbox.refresh(); // Оновлюємо lightbox.
+    }
+  } catch (error) {
+    console.error(error);
+    iziToast.error({
+      iconUrl: errorIcon,
+      iconColor: '#fff',
+      imageWidth: 24,
+      messageColor: '#fff',
+      message: 'An error occurred. Please try again later.',
     });
+  } finally {
+    loader.style.display = 'none'; // Завжди приховуємо завантажувач.
+  }
+
+  form.reset(); // Скидаємо форму.
 };
 
-form.addEventListener('submit', createGalary);
+form.addEventListener('submit', createGallery);
