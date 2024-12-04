@@ -119,6 +119,10 @@ ul {
   width: 50px;
 }
 
+.is-hidden {
+  display: none;
+}
+
 .loader:before,
 .loader:after {
   border-radius: 50%;
