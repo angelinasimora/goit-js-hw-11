@@ -43,7 +43,6 @@ const createGalary = e => {
   searchImage(searchText)
     .then(({ hits }) => {
       gallery.innerHTML = '';
-     
 
       const images = renderImages(hits);
       if (images) {
@@ -68,16 +67,22 @@ const createGalary = e => {
       form.reset();
     })
     .catch(error => {
-      console.log(error);
-      
-      gallery.innerHTML = '';
+      console.error(error); // Лог для розробника
+
+      // Приховуємо завантажувач
+      loader.style.display = 'none';
+
+      // Відображаємо помилку користувачу
       iziToast.error({
         iconUrl: errorIcon,
         iconColor: '#fff',
         imageWidth: 24,
         messageColor: '#fff',
-        message: error,
+        message: `An error occurred: ${error.message || 'Unknown error'}`,
       });
+
+      // Очищаємо галерею
+      gallery.innerHTML = '';
     });
 };
 
